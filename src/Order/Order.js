@@ -54,7 +54,7 @@ const DetailItem = styled.div`
   font-size: 10px;
 `;
 
-export function Order({ orders, setOrders, setOpenFood }) {
+export function Order({ orders, setOrders, setOpenFood, loggedIn, login }) {
   const subtotal = orders.reduce((total, order) => {
     return total + getPrice(order);
   }, 0);
@@ -72,59 +72,68 @@ export function Order({ orders, setOrders, setOpenFood }) {
       {orders.length === 0 ? (
         <OrderContent>Your order's looking pretty empty.</OrderContent>
       ) : (
-        <OrderContent>
-          {" "}
-          <OrderContainer> Your Order: </OrderContainer>{" "}
-          {orders.map((order, index) => (
-            <OrderContainer editable>
-              <OrderItem
-                onClick={() => {
-                  setOpenFood({ ...order, index });
-                }}
-              >
-                <div>{order.quantity}</div>
-                <div>{order.name}</div>
-                <div
-                  style={{ cursor: "pointer" }}
-                  onClick={e => {
-                    e.stopPropagation();
-                    deleteItem(index);
+          <OrderContent>
+            {" "}
+            <OrderContainer> Your Order: </OrderContainer>{" "}
+            {orders.map((order, index) => (
+              <OrderContainer editable>
+                <OrderItem
+                  onClick={() => {
+                    setOpenFood({ ...order, index });
                   }}
                 >
-                  🗑
+                  <div>{order.quantity}</div>
+                  <div>{order.name}</div>
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={e => {
+                      e.stopPropagation();
+                      deleteItem(index);
+                    }}
+                  >
+                    🗑
                 </div>
-                <div>{formatPrice(getPrice(order))}</div>
+                  <div>{formatPrice(getPrice(order))}</div>
+                </OrderItem>
+                <DetailItem>
+                  {order.toppings
+                    .filter(t => t.checked)
+                    .map(topping => topping.name)
+                    .join(", ")}
+                </DetailItem>
+                {order.choice && <DetailItem>{order.choice}</DetailItem>}
+              </OrderContainer>
+            ))}
+            <OrderContainer>
+              <OrderItem>
+                <div />
+                <div>Sub-Total</div>
+                <div>{formatPrice(subtotal)}</div>
               </OrderItem>
-              <DetailItem>
-                {order.toppings
-                  .filter(t => t.checked)
-                  .map(topping => topping.name)
-                  .join(", ")}
-              </DetailItem>
-              {order.choice && <DetailItem>{order.choice}</DetailItem>}
+              <OrderItem>
+                <div />
+                <div>Tax</div>
+                <div>{formatPrice(tax)}</div>
+              </OrderItem>
+              <OrderItem>
+                <div />
+                <div>Total</div>
+                <div>{formatPrice(total)}</div>
+              </OrderItem>
             </OrderContainer>
-          ))}
-          <OrderContainer>
-            <OrderItem>
-              <div />
-              <div>Sub-Total</div>
-              <div>{formatPrice(subtotal)}</div>
-            </OrderItem>
-            <OrderItem>
-              <div />
-              <div>Tax</div>
-              <div>{formatPrice(tax)}</div>
-            </OrderItem>
-            <OrderItem>
-              <div />
-              <div>Total</div>
-              <div>{formatPrice(total)}</div>
-            </OrderItem>
-          </OrderContainer>
-        </OrderContent>
-      )}
+          </OrderContent>
+        )}
       <DialogFooter>
-        <ConfirmButton>Checkout</ConfirmButton>
+        <ConfirmButton onClick={() => {
+          if (loggedIn) {
+            // setOpenOrderDialog(true);
+            // sendOrder(orders, loggedIn);
+            console.log('logged in')
+          } else {
+            login();
+          }
+        }}>Checkout
+        </ConfirmButton>
       </DialogFooter>
     </OrderStyled>
   );
