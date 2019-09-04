@@ -85,7 +85,7 @@ function sendOrder(orders, { email, displayName }) {
   });
 }
 
-export function Order({ orders, setOrders, setOpenFood, loggedIn, login }) {
+export function Order({ orders, setOrders, setOpenFood, loggedIn, login, setOpenOrderDialog }) {
   const subtotal = orders.reduce((total, order) => {
     return total + getPrice(order);
   }, 0);
@@ -154,18 +154,17 @@ export function Order({ orders, setOrders, setOpenFood, loggedIn, login }) {
             </OrderContainer>
           </OrderContent>
         )}
-      <DialogFooter>
+      {orders.length > 0 && <DialogFooter>
         <ConfirmButton onClick={() => {
           if (loggedIn) {
-            // setOpenOrderDialog(true);
+            setOpenOrderDialog(true);
             sendOrder(orders, loggedIn);
-            console.log('logged in')
           } else {
             login();
           }
         }}>Checkout
         </ConfirmButton>
-      </DialogFooter>
+      </DialogFooter>}
     </OrderStyled>
   );
 }
